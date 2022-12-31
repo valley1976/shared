@@ -29,9 +29,8 @@ namespace valley
         template<typename Fn>
         void safe_do(Fn&& fn)
         {
-            lock_.lock();
+            std::lock_guard<Lock> guard(lock_);
             fn(data_);
-            lock_.unlock();
         }
 
     private:
