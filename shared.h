@@ -36,6 +36,15 @@ namespace valley
             std::lock_guard<Lock> guard(lock_);
             fn(data_);
         }
+     
+        T& unsafe_ref()
+        {
+            return data_;
+        }
+     
+        const T& ref() const
+        {
+            return data_;
 
     private:
         Lock lock_;
