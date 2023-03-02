@@ -45,7 +45,7 @@ namespace valley
         const T& ref() const
         {
             return data_;
-
+        }
     private:
         Lock lock_;
         T data_;
