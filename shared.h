@@ -42,7 +42,7 @@ namespace valley
             return data_;
         }
      
-        const T& ref() const
+        const T& unsafe_ref() const
         {
             return data_;
         }
