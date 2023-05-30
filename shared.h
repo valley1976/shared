@@ -31,10 +31,10 @@ namespace valley
         Shared& operator=(const Shared&) = delete;
 
         template<typename Fn>
-        void safe_do(Fn&& fn)
+        auto safe_do(Fn&& fn)
         {
             std::lock_guard<Lock> guard(lock_);
-            fn(data_);
+            return fn(data_);
         }
      
         T& unsafe_ref()
