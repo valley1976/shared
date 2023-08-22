@@ -30,6 +30,30 @@ namespace valley
         Shared(const Shared&) = delete;
         Shared& operator=(const Shared&) = delete;
 
+        void operator=(const T& other)
+        {
+            std::lock_guard<Lock> guard(lock_);
+            data_ = other;
+        }
+
+        void operator=(T&& other)
+        {
+            std::lock_guard<Lock> guard(lock_);
+            data_ = std::move(other);
+        }
+
+        void copy_to(T& other) const
+        {
+            std::lock_guard<Lock> guard(lock_);
+            other = data_;
+        }
+
+        void move_to(T& other)
+        {
+            std::lock_guard<Lock> guard(lock_);
+            other = std::move(data_);
+        }
+
         template<typename Fn>
         auto safe_do(Fn&& fn)
         {
