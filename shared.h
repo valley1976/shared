@@ -16,8 +16,10 @@
 
 #include <mutex>
 
-namespace valley
-{
+#include <valley/utils/scope_exit.h>
+
+namespace valley::sync {
+
     template<typename T, typename Lock = std::mutex>
     class Shared
     {
@@ -60,20 +62,44 @@ namespace valley
             std::lock_guard<Lock> guard(lock_);
             return fn(data_);
         }
-     
-        T& unsafe_ref()
+
+        template<typename Fn>
+        auto safe_do(Fn&& fn) const
         {
-            return data_;
+            std::lock_guard<Lock> guard(lock_);
+            return fn(data_);
         }
-     
-        const T& unsafe_ref() const
+
+        template<typename Fn>
+        auto try_safe_do(Fn&& fn)
         {
-            return data_;
+            if (lock_.try_lock()) {
+                auto guard = utils::make_scope_exit(
+                    [this]() {
+                        lock_.unlock();
+                    }
+                );
+
+                return fn(data_);
+            }
         }
+
+        template<typename Fn>
+        auto try_safe_do(Fn&& fn) const
+        {
+            if (lock_.try_lock()) {
+                auto guard = utils::make_scope_exit(
+                    [this]() {
+                        lock_.unlock();
+                    }
+                );
+
+                return fn(data_);
+            }
+        }
+
     private:
-        Lock lock_;
+        mutable Lock lock_;
         T data_;
     };
 }
-
-
